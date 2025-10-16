@@ -1,37 +1,41 @@
-# Food & Nutrition Agent System
+# Emergency Resource Finder & Crisis Navigator
 
-A comprehensive multi-agent system for food and nutrition information, built with Google Cloud ADK (Agent Development Kit).
+A multi-agent system for finding emergency resources like shelters, hospitals, and food centers during crisis situations, built with Google Cloud ADK (Agent Development Kit).
+
+## 🚨 System Overview
+
+This system helps users find nearby emergency resources with safety-first guidance. It uses a coordinated multi-agent approach to query emergency resource databases and provide ranked, actionable recommendations.
 
 ## 🏗️ Architecture
 
-The system has been restructured from a single monolithic file into modular components:
+### ADK Agent Structure
+```
+adk_agents/
+└── emergency_navigator/           # Single ADK application
+    ├── __init__.py               # Package initialization
+    ├── agent.py                  # ADK entry point
+    ├── root_agent.py            # Main orchestrating agent
+    ├── data_agent.py            # Emergency data queries
+    ├── insights_agent.py        # Resource analysis & ranking
+    └── .env                     # Environment configuration
+```
 
-### Core Modules
+### Agent Roles
 
-1. **`google_utils.py`** - Google Cloud authentication and utilities
-   - Handles authentication with Google Cloud services
-   - Initializes Vertex AI and BigQuery
-   - Provides common configuration and utilities
+1. **Root Agent** (`erfcn_root_agent`)
+   - Main orchestrator for emergency resource navigation
+   - Interprets user intent and coordinates sub-agents
+   - Provides safety-first responses with emergency contacts
 
-2. **`geocode_tool.py`** - Geocoding functionality
-   - Forward geocoding (address → coordinates)
-   - Reverse geocoding (coordinates → address)
-   - Compatible with both legacy and modern ADK versions
+2. **Data Agent** (`emergency_data_agent`)
+   - Queries BigQuery for emergency resource data
+   - Handles location-based searches and filtering
+   - Accesses shelters, hospitals, and food distribution centers
 
-3. **`bigquery_agent.py`** - BigQuery data access
-   - Enhanced BigQueryAgent class for data exploration
-   - ADK-compatible agent creation for USDA food database
-   - Comprehensive database schema and querying capabilities
-
-4. **`agent_deployment.py`** - Agent Engine deployment
-   - Deployment manager for Google Cloud Agent Engine
-   - Testing framework for agents
-   - Image generation tools integration
-
-5. **`main_agent.py`** - Main orchestrating agent
-   - Coordinates all sub-agents and tools
-   - Interactive chat interface
-   - Demo conversation capabilities
+3. **Insights Agent** (`emergency_insights_agent`)
+   - Analyzes and ranks emergency resources
+   - Considers distance, availability, and user constraints
+   - Provides safety-aware recommendations
 
 ## 🚀 Quick Start
 
@@ -57,124 +61,124 @@ pip install google-cloud-aiplatform[adk,agent_engines] google-auth google-genai 
 
 ### Running the System
 
-#### Interactive Mode
+#### Local ADK Web Server (Recommended)
 ```bash
-python main_agent.py
+# Start the web server for interactive testing
+adk web adk_agents --port 8080
+
+# Access at: http://127.0.0.1:8080
 ```
 
-#### Deployment Mode
+#### Deploy to Google Agent Engine
 ```bash
-python main_agent.py --deploy
+# Deploy agents to Google Cloud (if individual agents exist)
+python deploy.py --list                    # List available agents
+python deploy.py --agent emergency_data   # Deploy specific agent
 ```
 
-#### Individual Components
-```bash
-# Test BigQuery agent
-python bigquery_agent.py
+## 🤖 System Capabilities
 
-# Test geocoding tools
-python geocode_tool.py
+### Emergency Resource Types
+- **Shelters**: Emergency housing with capacity, pet policies, accessibility info
+- **Hospitals**: Emergency rooms with bed availability and specialties
+- **Food Centers**: Distribution centers with dietary options and hours
 
-# Deploy to Agent Engine
-python agent_deployment.py
-```
+### Key Features
+- **Location-Based Search**: Uses geocoding to find nearby resources
+- **Smart Filtering**: Pet-friendly, dietary restrictions, capacity requirements
+- **Safety-First Responses**: Emergency contacts and crisis guidance
+- **Real-Time Data**: Current availability and status information
+- **Distance Calculation**: Prioritizes closer resources
 
-## 🤖 Agent Capabilities
-
-### Main Agent
-- **Food & Nutrition Queries**: Access to comprehensive USDA food database
-- **Allergy Research**: Web-based research on allergies and dietary restrictions
-- **Image Generation**: Create food-related images
-- **Location Services**: Geocoding for location-based food information
-
-### Sub-Agents
-
-1. **BigQuery Agent** (`usda_food_information_bigquery_agent`)
-   - Queries USDA food and nutrition database
-   - Provides nutritional information, food categories, and ingredient data
-   - Read-only access with comprehensive schema knowledge
-
-2. **Allergen Research Agent** (`allergy_research_agent`)
-   - Researches allergies and health information online
-   - Uses Google Search for up-to-date information
-   - Cites sources for all web-based information
-
-3. **Image Agent** (`imagen_tool_agent`)
-   - Generates food-related images using Gemini 2.5 Flash Image
-   - Uploads images to Google Cloud Storage
-   - Returns markdown-formatted image links
+### Agent Workflow
+1. **User Input**: "Find pet-friendly shelters near downtown with space for 3 people"
+2. **Root Agent**: Parses intent, extracts constraints (location, pet-friendly, capacity=3)
+3. **Data Agent**: Queries BigQuery for matching shelters within radius
+4. **Insights Agent**: Ranks results by distance, availability, and constraints
+5. **Root Agent**: Provides formatted response with top recommendations and safety info
 
 ## 🛠️ Tools Available
 
-- **BigQuery Tools**: Database querying and analysis
-- **Google Search**: Web search for current information
-- **Geocoding Tools**: Address/coordinate conversion
-- **Image Generation**: AI-powered image creation
+- **BigQuery Tools**: Emergency resource database querying
+- **Geocoding Tools**: Address/coordinate conversion for location searches
+- **Agent Communication**: Inter-agent messaging and coordination
 
 ## 📊 Database Schema
 
-The system works with a comprehensive USDA food database containing:
+The system expects a BigQuery dataset with emergency resource tables:
 
-- **food**: Main food items with descriptions and categories
-- **food_nutrient**: Nutritional values for foods
-- **nutrient**: Nutrient definitions and units
-- **food_category**: Food categorization system
-- **market_acquisition**: Food sourcing information
-- And many more specialized tables
+- **shelters**: Emergency housing facilities with capacity, policies, contact info
+- **hospitals**: Medical facilities with ER status, bed availability, specialties
+- **food_centers**: Food distribution locations with dietary options, hours
+- **locations**: Geographic data for all resources (coordinates, addresses)
+
+### Expected Dataset Structure
+```
+{project_id}.emergency_resources/
+├── shelters              # Emergency shelter information
+├── hospitals             # Hospital and medical facilities
+├── food_centers          # Food distribution centers
+└── locations             # Geographic reference data
+```
 
 ## 🔧 Configuration
 
-### Project Configuration
-The system automatically detects your Google Cloud project or you can specify it:
-
-```python
-from google_utils import initialize_google_cloud
-
-config, bq_tools = initialize_google_cloud(
-    project_id="your-project-id",
-    location="us-central1"
-)
-```
-
-### Agent Customization
-Each agent can be customized with different models and configurations:
-
-```python
-from bigquery_agent import create_usda_bigquery_agent
-
-agent = create_usda_bigquery_agent(
-    project_id="your-project",
-    dataset_name="your-project.your-dataset",
-    model="gemini-2.5-flash"
-)
-```
-
-## 🚀 Deployment
-
-### Local Testing
+### Environment Variables
+Set up your environment in `.env` file:
 ```bash
-python main_agent.py
+GOOGLE_GENAI_USE_VERTEXAI=true
+GOOGLE_CLOUD_LOCATION=us-central1
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_MAPS_API_KEY=your-maps-api-key  # Optional for geocoding
 ```
 
-### Agent Engine Deployment
+### Dataset Configuration
+The system expects emergency resource data in BigQuery:
+- **Dataset**: `{project_id}.emergency_resources`
+- **Location**: `us-central1` (default)
+- **Access**: Read-only queries for resource information
+
+## 🚀 Deployment Options
+
+### Option 1: Local ADK Web Server
 ```bash
-python agent_deployment.py
+# Start interactive web interface
+adk web adk_agents --port 8080
+
+# Benefits:
+# - Interactive web UI for testing
+# - Real-time agent communication
+# - Local development and debugging
 ```
 
-The deployment process:
-1. Initializes Google Cloud services
-2. Creates and tests agents
-3. Deploys to Google Cloud Agent Engine
-4. Returns deployment resource name
+### Option 2: Google Agent Engine
+```bash
+# Deploy individual agents to cloud (if available)
+python deploy.py --list
+python deploy.py --agent emergency_data
+
+# Benefits:
+# - Scalable cloud deployment
+# - Production-ready hosting
+# - Integration with other Google Cloud services
+```
 
 ## 📝 Example Queries
 
-- "List all tables in the USDA dataset"
-- "What are the top 10 foods highest in protein?"
-- "Give me a dinner recommendation for someone with dairy allergies"
-- "Create an image of a healthy breakfast"
-- "What foods are good sources of vitamin C?"
-- "Find nutritional information for apples"
+### Shelter Searches
+- "Find pet-friendly shelters near downtown with space for 3 people"
+- "Emergency shelter within 10 miles that accepts families"
+- "Wheelchair accessible shelters in San Francisco"
+
+### Hospital Searches  
+- "Nearest hospital with available emergency room beds"
+- "Hospitals with pediatric emergency services within 15 miles"
+- "Find trauma centers near highway 101"
+
+### Food Assistance
+- "Food banks with gluten-free options open today"
+- "Emergency food distribution within walking distance"
+- "Food centers that serve halal meals near me"
 
 ## 🔍 Troubleshooting
 
@@ -185,12 +189,19 @@ The deployment process:
    - Check project ID is correctly set
 
 2. **BigQuery Access Issues**
-   - Verify dataset exists and is accessible
-   - Check BigQuery API is enabled
+   - Verify emergency_resources dataset exists and is accessible
+   - Check BigQuery API is enabled in Google Cloud Console
+   - Ensure proper IAM permissions for BigQuery Data Viewer role
 
-3. **API Key Issues**
+3. **ADK Web Server Issues**
+   - Check if port is already in use (try different port)
+   - Verify all agent files are in correct directory structure
+   - Ensure relative imports are working correctly
+
+4. **Geocoding Issues**
    - Set `GOOGLE_MAPS_API_KEY` environment variable
    - Enable Maps JavaScript API in Google Cloud Console
+   - Check API key has proper permissions
 
 ### Debug Mode
 Set environment variable for detailed logging:
@@ -198,28 +209,34 @@ Set environment variable for detailed logging:
 export GOOGLE_CLOUD_LOG_LEVEL=DEBUG
 ```
 
-## 📚 API Reference
+### Testing Agent Communication
+```bash
+# Test individual agent files
+cd adk_agents/emergency_navigator
+python -c "from data_agent import create_data_agent; print('✅ Data agent works')"
+python -c "from insights_agent import create_insights_agent; print('✅ Insights agent works')"
+```
 
-### Core Classes
+## 🚨 Safety Guidelines
 
-- `GoogleCloudConfig`: Configuration management
-- `BigQueryAgent`: Database interaction
-- `AgentDeploymentManager`: Deployment orchestration
-- `FoodNutritionAgentSystem`: Main system coordinator
+### Emergency Protocols
+- **Immediate Danger**: Always direct users to call 911 first
+- **Mental Health Crisis**: Provide 988 crisis hotline (call or text)
+- **Medical Emergencies**: Prioritize hospitals with available ER beds
+- **Shelter Needs**: Consider weather, safety, and capacity constraints
 
-### Key Functions
-
-- `initialize_google_cloud()`: Setup Google Cloud services
-- `create_usda_bigquery_agent()`: Create BigQuery agent
-- `get_geocoding_tools()`: Get geocoding tool instances
+### Data Privacy
+- Only use publicly available emergency resource data
+- Never store or log personal user information
+- Provide general guidance, not medical advice
 
 ## 🤝 Contributing
 
-1. Follow the modular structure
-2. Add comprehensive docstrings
-3. Include error handling
-4. Test with both local and deployed environments
+1. **Agent Development**: Follow ADK multi-agent patterns
+2. **Safety First**: Always prioritize user safety in responses  
+3. **Testing**: Test both local ADK server and cloud deployment
+4. **Documentation**: Update README for any structural changes
 
 ## 📄 License
 
-This project is part of the MSDS 501 Computation course materials.
+This project is part of the Google Cloud ADK emergency response system demonstration.

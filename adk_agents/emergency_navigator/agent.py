@@ -4,10 +4,6 @@ Emergency Resource Finder & Crisis Navigator Agent for ADK Web Server
 """
 
 import os
-import sys
-
-# Add parent directories to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
 # Set up Vertex AI environment variables
 os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "true"
