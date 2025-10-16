@@ -11,14 +11,14 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Import agents
-from agents.bigquery_agent import create_usda_bigquery_agent
+from agents.fema2_agent import create_emergency_crisis_bigquery_agent
 
 # Get project info from environment
-project_id = os.environ.get('GOOGLE_CLOUD_PROJECT', 'your-project-id')
+project_id = os.environ.get('GOOGLE_CLOUD_PROJECT', 'qwiklabs-gcp-01-2a76b8f0c7a6')
 dataset_name = f"{project_id}.B2AgentsForImpact"
 
 # Create the agent instance
-agent = create_usda_bigquery_agent(
+agent = create_emergency_crisis_bigquery_agent(
     project_id=project_id,
     dataset_name=dataset_name
 )
