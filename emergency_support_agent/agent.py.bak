@@ -1,0 +1,109 @@
+import os
+import sys
+import logging
+
+sys.path.append("..")
+from callback_logging import log_query_to_model, log_model_response
+from dotenv import load_dotenv
+import google.cloud.logging
+from google.adk import Agent
+from google.genai import types
+from typing import Optional, List, Dict
+from google.adk.tools import google_search
+
+from google.adk.tools.tool_context import ToolContext
+from google.adk.tools.agent_tool import AgentTool
+
+load_dotenv()
+
+cloud_logging_client = google.cloud.logging.Client()
+cloud_logging_client.setup_logging()
+
+# Tools (add the tool here when instructed)
+
+import requests
+def get_user_location() -> dict:
+    """Gets current location based on IP address."""
+    try:
+        response = requests.get('https://ipapi.co/json/', timeout=5)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                "status": "success",
+                "latitude": data.get("latitude"),
+                "longitude": data.get("longitude"),
+                "city": data.get("city", "Unknown"),
+                "region": data.get("region", "Unknown")
+            }
+    except Exception as e:
+        return {"status": "error", "error_message": str(e)}
+# Agents
+
+# Location agent
+location_agent = Agent(
+    name="location_agent",
+    model=os.getenv("MODEL"),
+    description="Determines user's current location",
+    instruction="Use get_user_location to find the user's coordinates.",
+    tools=[get_user_location]
+)
+
+hospital_agent = Agent(
+    name="hospital_agent",
+    model=os.getenv("MODEL"),
+    description="Help a user find hospitals",
+    instruction="""
+        Provide a few suggestions for hospitals.
+        Present the results as a list of locations with addresses
+        """,
+    before_model_callback=log_query_to_model,
+    after_model_callback=log_model_response,
+    # When instructed to do so, paste the tools parameter below this line
+    tools=[google_search]
+    )
+
+shelter_agent = Agent(
+    name="shelter_agent",
+    model=os.getenv("MODEL"),
+    description="Help a user find emergency shelters using the coordinates provided by the user",
+    instruction="""
+        Provide a few suggestions of emergency shelters using the coordinates provided by the user
+        Present the results as a list of locations with addresses   
+        """,
+    before_model_callback=log_query_to_model,
+    after_model_callback=log_model_response,
+    tools = [google_search]
+)
+
+dietary_agent = Agent(
+    name="dietary_agent",
+    model=os.getenv("MODEL"),
+    description="Help a user find food distribution sites using the coordinates provided by the user",
+    instruction="""
+        Provide a few suggestions food distribution sites using the coordinates provided by the user
+        Present the results as a list of locations with addresses   
+        """,
+    before_model_callback=log_query_to_model,
+    after_model_callback=log_model_response,
+    tools = [google_search]
+)
+
+root_agent = Agent(
+    name="emergency_responder",
+    model=os.getenv("MODEL"),
+    description="Disaster emergency responder.",
+    instruction="""
+        You're a disaster, emergency responder. 
+        First use the location_agent to find the user's location coorodinates.
+        Then use these coordinates as input for the following:
+        Use the shelter_agent tool when the user asks about shelters
+        Use the hospital_agent when the user asks about hospitals
+        Use the dietary_agent when the user asks about food distribution sites
+        """,
+    generate_content_config=types.GenerateContentConfig(
+        temperature=0,
+    ),
+    tools=[AgentTool(agent=location_agent), AgentTool(agent=shelter_agent), AgentTool(agent=hospital_agent), AgentTool(agent=dietary_agent)]
+    # Add the sub_agents parameter when instructed below this line
+    #sub_agents = [shelter_agent, hospital_agent]
+)
