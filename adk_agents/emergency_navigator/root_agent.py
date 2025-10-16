@@ -7,8 +7,28 @@ Required by ADK web server.
 import os
 import sys
 
-from .data_agent import create_data_agent
-from .insights_agent import create_insights_agent
+# Import sub-agents - use absolute imports for deployment
+try:
+    from .data_agent import create_data_agent
+    from .insights_agent import create_insights_agent
+except ImportError:
+    # Fallback to direct imports for deployment
+    import importlib.util
+    import os
+    
+    # Load data_agent
+    data_agent_path = os.path.join(os.path.dirname(__file__), 'data_agent.py')
+    spec = importlib.util.spec_from_file_location("data_agent", data_agent_path)
+    data_agent_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(data_agent_module)
+    create_data_agent = data_agent_module.create_data_agent
+    
+    # Load insights_agent
+    insights_agent_path = os.path.join(os.path.dirname(__file__), 'insights_agent.py')
+    spec = importlib.util.spec_from_file_location("insights_agent", insights_agent_path)
+    insights_agent_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(insights_agent_module)
+    create_insights_agent = insights_agent_module.create_insights_agent
 
 # Add parent directories to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))

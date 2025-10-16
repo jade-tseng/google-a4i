@@ -35,15 +35,20 @@ def create_emergency_navigator_agent(project_id: str, dataset_name: str = None, 
     if dataset_name is None:
         dataset_name = f"{project_id}.emergency_resources"
     
-    # Setup BigQuery tools
-    credentials, _ = google.auth.default()
-    bq_credentials = BigQueryCredentialsConfig(credentials=credentials)
-    bq_tool_cfg = BigQueryToolConfig(write_mode=WriteMode.BLOCKED)  # Read-only
-    
-    bq_tools = BigQueryToolset(
-        credentials_config=bq_credentials,
-        bigquery_tool_config=bq_tool_cfg
-    )
+    # Setup BigQuery tools - simplified for deployment
+    try:
+        credentials, _ = google.auth.default()
+        bq_credentials = BigQueryCredentialsConfig(credentials=credentials)
+        bq_tool_cfg = BigQueryToolConfig(write_mode=WriteMode.BLOCKED)  # Read-only
+        
+        bq_tools = BigQueryToolset(
+            credentials_config=bq_credentials,
+            bigquery_tool_config=bq_tool_cfg
+        )
+        tools = [bq_tools]
+    except Exception as e:
+        print(f"⚠️  BigQuery tools not available: {e}")
+        tools = []  # Deploy without BigQuery tools for now
     
     # Consolidated instructions for emergency resource navigation
     instructions = f"""
@@ -99,12 +104,18 @@ def create_emergency_navigator_agent(project_id: str, dataset_name: str = None, 
     Be empathetic, concise, and always prioritize user safety.
     """
     
+    # Add geocode tool if available
+    try:
+        tools.append(geocode_tool)
+    except Exception as e:
+        print(f"⚠️  Geocode tool not available: {e}")
+    
     return Agent(
         model=model,
         name="emergency_resource_navigator",
         description="Finds and recommends emergency resources like shelters, hospitals, and food centers with safety guidance",
         instruction=instructions,
-        tools=[geocode_tool, bq_tools],
+        tools=tools,
         generate_content_config=types.GenerateContentConfig(
             temperature=0.6,
             top_p=0.9,
