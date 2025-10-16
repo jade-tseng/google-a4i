@@ -153,14 +153,41 @@ adk web adk_agents --port 8080
 
 ### Option 2: Google Agent Engine
 ```bash
-# Deploy individual agents to cloud (if available)
-python deploy.py --list
-python deploy.py --agent emergency_data
+# Deploy individual agents to cloud
+python deploy.py --list                           # List available agents
+python deploy.py --agent emergency_navigator     # Deploy specific agent
 
 # Benefits:
 # - Scalable cloud deployment
 # - Production-ready hosting
 # - Integration with other Google Cloud services
+```
+
+### Option 3: Vertex AI Application
+```bash
+# Deploy as full Vertex AI application
+python deploy_vertex_app.py --app-name emergency-navigator
+
+# With endpoint for serving
+python deploy_vertex_app.py --create-endpoint
+
+# Benefits:
+# - Enterprise-grade AI platform
+# - Built-in monitoring and scaling
+# - Integration with Vertex AI ecosystem
+```
+
+### Option 4: Complete Deployment Workflow
+```bash
+# Run complete deployment pipeline
+python deploy_workflow.py --step all
+
+# Or run individual steps
+python deploy_workflow.py --step check          # Check prerequisites
+python deploy_workflow.py --step local          # Test local ADK
+python deploy_workflow.py --step agent-engine   # Deploy to Agent Engine
+python deploy_workflow.py --step vertex-ai      # Deploy to Vertex AI
+python deploy_workflow.py --step endpoint       # Create serving endpoint
 ```
 
 ## 📝 Example Queries
