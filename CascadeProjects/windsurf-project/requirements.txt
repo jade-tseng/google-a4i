@@ -1,0 +1,30 @@
+# Google Cloud ADK and Agent Engine
+google-cloud-aiplatform[adk,agent_engines]>=1.70.0
+google-auth>=2.0.0
+google-genai>=0.8.0
+
+# Core Google Cloud and BigQuery
+google-cloud-bigquery>=3.11.4
+google-cloud-storage>=2.0.0
+pandas>=2.0.3
+
+# Location services
+googlemaps==4.10.0
+geopy==2.3.0
+requests==2.31.0
+
+# Web framework for location-based web app
+flask==2.3.3
+flask-cors==4.0.0
+
+# Optional: For mobile app development
+# kivy==2.2.0  # For mobile apps
+# plyer==2.1.0  # For device sensors
+
+# Data visualization (optional)
+folium==0.14.0
+plotly==5.15.0
+
+# Development and testing
+pytest==7.4.0
+python-dotenv==1.0.0

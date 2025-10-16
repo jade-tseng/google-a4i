@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Location Map</title>
+    <style>
+        /* Always set the map height explicitly to define the size of the div element that contains the map. */
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .custom-map-control-button {
+            background-color: #fff;
+            border: 2px solid #fff;
+            border-radius: 3px;
+            box-shadow: 0 2px 6px rgba(0,0,0,.3);
+            color: rgb(25,25,25);
+            cursor: pointer;
+            font-family: Roboto,Arial,sans-serif;
+            font-size: 16px;
+            line-height: 38px;
+            margin: 8px 0 22px;
+            padding: 0 5px;
+            text-align: center;
+        }
+        
+        .custom-map-control-button:hover {
+            background-color: #ebebeb;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    
+    <!-- Load the Google Maps JavaScript API -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAk3h2srJGmWAyCeISHdFE2zP7b2A8WBIk&callback=initMap">
+    </script>
+    
+    <!-- Load your JavaScript file -->
+    <script src="index.js"></script>
+</body>
+</html>
