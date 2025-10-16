@@ -1,0 +1,6 @@
+Flask==2.3.3
+Flask-CORS==4.0.0
+google-cloud-aiplatform[adk,agent_engines]>=1.70.0
+google-auth>=2.0.0
+google-genai>=0.8.0
+vertexai>=1.0.0

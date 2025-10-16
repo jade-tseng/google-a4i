@@ -17,7 +17,7 @@ import google.auth
 import vertexai
 from vertexai import agent_engines
 from google.cloud import aiplatform
-from agents.emergency_navigator_agent import create_emergency_navigator_agent
+from agents.simple_emergency_agent import create_simple_emergency_agent
 
 
 def get_project_info():
@@ -78,9 +78,9 @@ def create_vertex_ai_app(project_id: str, app_name: str = "emergency-navigator")
         print(f"📍 Location: {location}")
         print(f"🗄️  Staging bucket: {staging_bucket}")
         
-        # Create the emergency navigator agent
+        # Create the simple emergency agent
         dataset_name = f"{project_id}.emergency_resources"
-        agent = create_emergency_navigator_agent(project_id, dataset_name)
+        agent = create_simple_emergency_agent(project_id, dataset_name)
         
         print(f"✅ Agent created: {agent.name}")
         
