@@ -359,7 +359,7 @@ def create_emergency_crisis_bigquery_agent(project_id: str, dataset_name: str, m
     "column_name": "state",
     "data_type": "STRING"
   }, {
-    "column_name": "pet_population",
+    "column_name": "pet_capacity",
     "data_type": "INT64"
   },
   {
@@ -375,6 +375,27 @@ def create_emergency_crisis_bigquery_agent(project_id: str, dataset_name: str, m
     "data_type": "INT64"
   },
   "column_name": "shelter_status_code",
+    "data_type": "STRING"
+  },
+  {
+    "column_name": "lattitude",
+    "data_type": "FLOAT"
+  },
+  {
+    "column_name": "longitude",
+    "data_type": "FLOAT"
+  },{
+    "column_name": "ada_compliant",
+    "data_type": "STRING"
+  },{
+    "column_name": "evacuation_capacity",
+    "data_type": "STRING"
+  },
+  {
+    "column_name": "org_main_phone",
+    "data_type": "STRING"
+  }, {
+    "column_name": "address_1",
     "data_type": "STRING"
   }]
 },
@@ -436,17 +457,56 @@ def create_emergency_crisis_bigquery_agent(project_id: str, dataset_name: str, m
     "column_name": "desginatedArea",
     "data_type": "STRING"
   }]
-}]
+},
+{
+  "table_name": "Food_Banks",
+  "fields": [{
+    "column_name": "service_area",
+    "data_type": "STRING"
+  }, {
+    "column_name": "phone",
+    "data_type": "STRING"
+  },
+  {
+    "column_name": "city",
+    "data_type": "STRING"
+  }, {
+    "column_name": "county",
+    "data_type": "STRING"
+  }, {
+    "column_name": "state",
+    "data_type": "STRING"
+  },
+  {
+    "column_name": "zip_code",
+    "data_type": "INT64"
+  },
+  {
+    "column_name": "name",
+    "data_type": "STRING"
+  },
+  {
+    "column_name": "zip",
+    "data_type": "INT64"
+  },{
+  "column_name": "street",
+    "data_type": "STRING"
+  },
+  {
+    "column_name": "website",
+    "data_type": "STRING"
+  }]
+  }]
     """
 
     # Agent instructions
     PROJECT_ID = "qwiklabs-gcp-01-2a76b8f0c7a6" # @param {type:"string"}
-    DATASET_NAME = "qwiklabs-gcp-01-2a76b8f0c7a6.B2AgentsForImpact"
+    DATASET_NAME = "B2AgentsForImpact"
     instructions = f"""
-The dataset you have access to contains information from FEMA e.g. fema_nssf, hospital_gengeral_info and other tables
-have info about emergency shelters and related information.
+The dataset you have access to contains information from FEMA e.g. fema_nssf, hospital_gengeral_info, Food_Banks and other tables
+have info about emergency shelters, pet capacity, etc.
 Only query the dataset `{PROJECT_ID}.{DATASET_NAME}`.
-Fully qualify every table as `{PROJECT_ID}.{DATASET_NAME}.<table>`.
+Fully qualify every table as `{PROJECT_ID}.{DATASET_NAME}.<table>`. Use all available tables and fields to make jugdement.
 Never perform DDL/DML; SELECT-only. Return the SQL you ran along with a concise answer.
 Here is the database schema, please study it {DB_SCHEMA}
     """
@@ -454,8 +514,8 @@ Here is the database schema, please study it {DB_SCHEMA}
     # Create and return the agent
     return Agent(
         model=model,
-        name="usda_food_information_bigquery_agent",
-        description="Analyzes tables in a BigQuery dataset that contains food information from the USDA.",
+        name="fema_information_bigquery_agent",
+        description="Analyzes tables in a BigQuery FEMA dataset.",
         instruction=instructions,
         tools=[bq_tools],
     )
