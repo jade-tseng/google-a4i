@@ -15,8 +15,8 @@ os.environ["GOOGLE_CLOUD_LOCATION"] = "us-central1"
 
 import vertexai
 
-# Import the root agent
-from root_agent import root_agent
+# Import the root agent from local file
+from .root_agent import root_agent
 
 print(f"✅ Emergency Resource Finder & Crisis Navigator Agent loaded for ADK web server")
 print(f"🚨 Agent: {root_agent.name}")
