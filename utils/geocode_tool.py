@@ -154,6 +154,7 @@ class GeocodeToolLegacy:
     
     name = "maps_geocode"
     description = "Convert a street address to latitude/longitude using Google Maps Geocoding API."
+    __name__ = "maps_geocode"  # Add __name__ attribute for ADK compatibility
 
     def __call__(self, *, address: str) -> Dict[str, Any]:
         """Geocode an address to coordinates."""
@@ -165,6 +166,7 @@ class ReverseGeocodeToolLegacy:
     
     name = "maps_reverse_geocode"
     description = "Convert latitude/longitude coordinates to a street address using Google Maps Geocoding API."
+    __name__ = "maps_reverse_geocode"  # Add __name__ attribute for ADK compatibility
 
     def __call__(self, *, lat: float, lon: float) -> Dict[str, Any]:
         """Reverse geocode coordinates to address."""
