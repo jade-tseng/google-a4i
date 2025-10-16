@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-USDA BigQuery Agent for ADK Web Server
+Root Agent for USDA BigQuery Agent
+Required by ADK web server.
 """
 
 import os
@@ -9,11 +10,6 @@ import sys
 # Add parent directories to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-# Set up Vertex AI environment variables
-os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "true"
-os.environ["GOOGLE_CLOUD_LOCATION"] = "us-central1"
-
-import vertexai
 from agents.bigquery_agent import create_usda_bigquery_agent
 
 # Get project info from environment
@@ -37,19 +33,12 @@ if not project_id:
 
 dataset_name = f"{project_id}.B2AgentsForImpact"
 
-# Initialize Vertex AI
-try:
-    vertexai.init(project=project_id, location="us-central1")
-    print(f"✅ Vertex AI initialized for project: {project_id}")
-except Exception as e:
-    print(f"⚠️  Vertex AI initialization warning: {e}")
-
-# Create the root_agent instance - this is what ADK web server expects
+# Create the root agent instance - this is what ADK web server expects
 root_agent = create_usda_bigquery_agent(
     project_id=project_id,
     dataset_name=dataset_name
 )
 
-print(f"✅ USDA BigQuery Agent loaded for ADK web server")
+print(f"✅ Root agent loaded: {root_agent.name}")
 print(f"📊 Project: {project_id}")
 print(f"🗄️  Dataset: {dataset_name}")
