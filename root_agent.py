@@ -1,7 +1,42 @@
 # root_agent.py
+import os
+import sys
+
+# Add current directory to path
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
 from google.adk.agents import Agent
 from google.genai import types
 from google.adk.tools import agent_tool
+
+# Import the required components
+from utils.geocode_tool import geocode_tool
+from agents.data_agent import create_data_agent
+from agents.insights_agent import create_insights_agent
+
+# Get project configuration
+project_id = os.environ.get('GOOGLE_CLOUD_PROJECT')
+if not project_id:
+    # Try to get from gcloud
+    import subprocess
+    try:
+        result = subprocess.run(
+            ['gcloud', 'config', 'get-value', 'project'],
+            capture_output=True, text=True
+        )
+        if result.returncode == 0 and result.stdout.strip() != "(unset)":
+            project_id = result.stdout.strip()
+    except:
+        pass
+
+if not project_id:
+    project_id = "your-project-id"
+    print("⚠️  Could not determine project ID. Using placeholder.")
+
+# Create the sub-agents
+dataset_name = f"{project_id}.emergency_resources"
+data_agent = create_data_agent(project_id, dataset_name)
+insights_agent = create_insights_agent()
 
 
 MODEL = "gemini-2.5-flash"

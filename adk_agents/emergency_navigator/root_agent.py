@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Root Agent for USDA BigQuery Agent
+Root Agent for Emergency Resource Finder & Crisis Navigator
 Required by ADK web server.
 """
 
@@ -10,7 +10,11 @@ import sys
 # Add parent directories to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 
-from agents.bigquery_agent import create_usda_bigquery_agent
+# Set up Vertex AI environment variables
+os.environ["GOOGLE_GENAI_USE_VERTEXAI"] = "true"
+os.environ["GOOGLE_CLOUD_LOCATION"] = "us-central1"
+
+import vertexai
 
 # Get project info from environment
 project_id = os.environ.get('GOOGLE_CLOUD_PROJECT')
@@ -31,14 +35,16 @@ if not project_id:
     project_id = "your-project-id"
     print("⚠️  Could not determine project ID. Using placeholder.")
 
-dataset_name = f"{project_id}.B2AgentsForImpact"
+# Initialize Vertex AI
+try:
+    vertexai.init(project=project_id, location="us-central1")
+    print(f"✅ Vertex AI initialized for project: {project_id}")
+except Exception as e:
+    print(f"⚠️  Vertex AI initialization warning: {e}")
 
-# Create the root agent instance - this is what ADK web server expects
-root_agent = create_usda_bigquery_agent(
-    project_id=project_id,
-    dataset_name=dataset_name
-)
+# Import and create the root agent
+from root_agent import root_agent
 
-print(f"✅ Root agent loaded: {root_agent.name}")
+print(f"✅ Emergency Navigator root agent loaded: {root_agent.name}")
 print(f"📊 Project: {project_id}")
-print(f"🗄️  Dataset: {dataset_name}")
+print(f"🚨 System: Emergency Resource Finder & Crisis Navigator")
